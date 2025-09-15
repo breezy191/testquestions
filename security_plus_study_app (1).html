@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CompTIA Security+ Study App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .setup-section {
+            display: block;
+        }
+
+        .quiz-section, .results-section {
+            display: none;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #36d1dc 0%, #5b86e5 100%);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+        }
+
+        .question-container {
+            margin-bottom: 25px;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .question-number {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 18px;
+        }
+
+        .timer {
+            font-weight: bold;
+            color: #ee5a6f;
+            font-size: 18px;
+        }
+
+        .question-text {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .answer-option {
+            margin-bottom: 12px;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .answer-option:hover {
+            border-color: #667eea;
+            background: #e3f2fd;
+        }
+
+        .answer-option.selected {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+
+        .answer-option.correct {
+            border-color: #28a745;
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .answer-option.incorrect {
+            border-color: #dc3545;
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e9ecef;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .review-question {
+            margin-bottom: 25px;
+            padding: 20px;
+            border-left: 4px solid #dc3545;
+            background: #f8f9fa;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .review-question.correct {
+            border-left-color: #28a745;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-input-display {
+            display: block;
+            padding: 12px;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            text-align: center;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+
+        .file-input-wrapper:hover .file-input-display {
+            border-color: #667eea;
+            background: #e3f2fd;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .explanation {
+            margin-top: 15px;
+            padding: 15px;
+            background: #e8f5e8;
+            border-left: 4px solid #28a745;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .range-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛡️ CompTIA Security+ Study App</h1>
+            <p>Master your Security+ certification with randomized practice tests</p>
+        </div>
+
+        <!-- Setup Section -->
+        <div id="setupSection" class="card setup-section">
+            <h2>📚 Setup Your Study Session</h2>
+            
+            <div class="form-group">
+                <label for="fileInput">Upload your question file (.txt):</label>
+                <div class="file-input-wrapper">
+                    <input type="file" id="fileInput" accept=".txt" />
+                    <label for="fileInput" class="file-input-display">
+                        Click to select your questions.txt file
+                    </label>
+                </div>
+                <small>File should contain questions in the format shown in your examples</small>
+            </div>
+
+            <div class="form-group">
+                <label for="studyMode">Study Mode:</label>
+                <select id="studyMode">
+                    <option value="practice">Practice Mode (Immediate Feedback)</option>
+                    <option value="timed">Timed Test Mode (90 minutes)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="numQuestions">Number of Questions:</label>
+                <select id="numQuestions">
+                    <option value="10">10 Questions</option>
+                    <option value="25">25 Questions</option>
+                    <option value="50">50 Questions</option>
+                    <option value="90">90 Questions (Full Test)</option>
+                    <option value="all">All Available Questions</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Question Range (Optional):</label>
+                <div class="range-selector">
+                    <input type="number" id="rangeStart" placeholder="Start question #" min="1">
+                    <input type="number" id="rangeEnd" placeholder="End question #" min="1">
+                </div>
+                <small>Leave empty to use all questions</small>
+            </div>
+
+            <button class="btn" onclick="startQuiz()">Start Study Session</button>
+        </div>
+
+        <!-- Quiz Section -->
+        <div id="quizSection" class="card quiz-section">
+            <div class="question-header">
+                <span class="question-number" id="questionNumber">Question 1 of 10</span>
+                <span class="timer" id="timer">Time: 90:00</span>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+
+            <div class="question-container">
+                <div class="question-text" id="questionText">Loading question...</div>
+                <div id="answerOptions"></div>
+                <div id="explanation" class="explanation hidden"></div>
+            </div>
+
+            <div style="text-align: center;">
+                <button class="btn btn-secondary" onclick="previousQuestion()" id="prevBtn">Previous</button>
+                <button class="btn" onclick="nextQuestion()" id="nextBtn">Next Question</button>
+                <button class="btn btn-success hidden" onclick="finishQuiz()" id="finishBtn">Finish Quiz</button>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="resultsSection" class="card results-section">
+            <h2>📊 Quiz Results</h2>
+            
+            <div class="stats" id="statsContainer">
+                <!-- Stats will be populated by JavaScript -->
+            </div>
+
+            <div id="reviewContainer">
+                <h3>📋 Review Incorrect Answers</h3>
+                <div id="incorrectAnswers"></div>
+            </div>
+
+            <div style="text-align: center; margin-top: 25px;">
+                <button class="btn" onclick="restartApp()">New Study Session</button>
+                <button class="btn btn-secondary" onclick="retakeQuiz()">Retake Same Quiz</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let allQuestions = [];
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        let studyMode = 'practice';
+        let startTime = null;
+        let timerInterval = null;
+        let timeLimit = 5400; // 90 minutes in seconds
+
+        // File handling
+        document.getElementById('fileInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const content = e.target.result;
+                    parseQuestions(content);
+                    document.querySelector('.file-input-display').textContent = `✓ ${file.name} loaded (${allQuestions.length} questions)`;
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        // Initialize on page load
+        initializeTestHistory();
+
+        // Parse questions from text file
+        function parseQuestions(content) {
+            allQuestions = [];
+            const lines = content.split('\n');
+            let currentQuestion = null;
+            let questionText = '';
+            let options = [];
+            let answers = [];
+
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                
+                if (line.startsWith('Question #')) {
+                    // Save previous question if exists
+                    if (currentQuestion) {
+                        currentQuestion.text = questionText.trim();
+                        currentQuestion.options = [...options];
+                        currentQuestion.correctAnswers = [...answers];
+                        allQuestions.push(currentQuestion);
+                    }
+                    
+                    // Start new question
+                    const questionNum = line.match(/Question #(\d+)/)[1];
+                    currentQuestion = {
+                        id: parseInt(questionNum),
+                        text: '',
+                        options: [],
+                        correctAnswers: []
+                    };
+                    questionText = '';
+                    options = [];
+                    answers = [];
+                } else if (line.match(/^[A-D]\./)) {
+                    // Option line
+                    options.push(line);
+                } else if (line.startsWith('Answer:')) {
+                    // Answer line - can have multiple answers separated by commas
+                    const answerText = line.replace('Answer:', '').trim();
+                    answers = answerText.split(',').map(a => a.trim());
+                } else if (line && currentQuestion && !line.startsWith('Answer:')) {
+                    // Question text line
+                    questionText += line + ' ';
+                }
+            }
+
+            // Don't forget the last question
+            if (currentQuestion) {
+                currentQuestion.text = questionText.trim();
+                currentQuestion.options = [...options];
+                currentQuestion.correctAnswers = [...answers];
+                allQuestions.push(currentQuestion);
+            }
+
+            console.log(`Parsed ${allQuestions.length} questions`);
+        }
+
+        // Start quiz
+        function startQuiz() {
+            if (allQuestions.length === 0) {
+                alert('Please upload a question file first!');
+                return;
+            }
+
+            // Get settings
+            studyMode = document.getElementById('studyMode').value;
+            const numQuestions = document.getElementById('numQuestions').value;
+            const rangeStart = parseInt(document.getElementById('rangeStart').value) || null;
+            const rangeEnd = parseInt(document.getElementById('rangeEnd').value) || null;
+
+            // Filter questions by range if specified
+            let availableQuestions = [...allQuestions];
+            if (rangeStart && rangeEnd) {
+                availableQuestions = allQuestions.filter(q => q.id >= rangeStart && q.id <= rangeEnd);
+            }
+
+            // Select questions
+            if (numQuestions === 'all') {
+                currentQuestions = [...availableQuestions];
+            } else {
+                const num = parseInt(numQuestions);
+                currentQuestions = shuffleArray(availableQuestions).slice(0, Math.min(num, availableQuestions.length));
+            }
+
+            // Initialize quiz state
+            currentQuestionIndex = 0;
+            userAnswers = new Array(currentQuestions.length).fill(null);
+            startTime = Date.now();
+
+            // Start timer if in timed mode
+            if (studyMode === 'timed') {
+                startTimer();
+            }
+
+            // Show quiz section
+            document.getElementById('setupSection').style.display = 'none';
+            document.getElementById('quizSection').style.display = 'block';
+
+            displayQuestion();
+        }
+
+        // Test History Functions
+        function displayTestHistory() {
+            const historyContainer = document.getElementById('testHistory');
+            const historyStats = document.getElementById('historyStats');
+            
+            if (testHistory.length === 0) {
+                historyContainer.innerHTML = '<div class="no-history">No tests taken yet</div>';
+                historyStats.style.display = 'none';
+                return;
+            }
+            
+            // Calculate overall stats
+            const totalTests = testHistory.length;
+            const passedTests = testHistory.filter(test => test.passed).length;
+            const averageScore = Math.round(testHistory.reduce((sum, test) => sum + test.score, 0) / totalTests);
+            const passRate = Math.round((passedTests / totalTests) * 100);
+            
+            // Show stats summary
+            historyStats.style.display = 'grid';
+            historyStats.innerHTML = `
+                <div class="stat-item">
+                    <div class="stat-value">${totalTests}</div>
+                    <div class="stat-label">Total Tests</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" style="color: ${passRate >= 50 ? '#10b981' : '#ef4444'}">${passRate}%</div>
+                    <div class="stat-label">Pass Rate</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${averageScore}%</div>
+                    <div class="stat-label">Avg Score</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" style="color: #8b5cf6">${passedTests}</div>
+                    <div class="stat-label">Tests Passed</div>
+                </div>
+            `;
+            
+            // Display test history
+            historyContainer.innerHTML = testHistory.map(test => {
+                const date = new Date(test.date);
+                const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                
+                return `
+                    <div class="history-item">
+                        <div class="history-info">
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <span class="history-score ${test.passed ? 'pass' : 'fail'}">${test.score}%</span>
+                                <span style="color: #e4e4e7; font-weight: 500;">${test.correct}/${test.total} correct</span>
+                            </div>
+                            <div class="history-details">
+                                ${test.mode === 'timed' ? '⏱️ Timed' : '📚 Practice'} • ${test.timeSpent} • 
+                                ${test.passed ? '✅ PASS' : '❌ FAIL'}
+                            </div>
+                        </div>
+                        <div class="history-date">${dateStr}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function clearHistory() {
+            if (confirm('Are you sure you want to clear all test history?')) {
+                testHistory = [];
+                localStorage.removeItem('testHistory');
+                displayTestHistory();
+            }
+        }
+
+        // Initialize test history display on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            displayTestHistory();
+        });
+
+        // Utility function to shuffle array
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        // Timer functions
+        function startTimer() {
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function updateTimer() {
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            const remaining = Math.max(0, timeLimit - elapsed);
+            
+            const minutes = Math.floor(remaining / 60);
+            const seconds = remaining % 60;
+            
+            document.getElementById('timer').textContent = `Time: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            if (remaining === 0) {
+                clearInterval(timerInterval);
+                finishQuiz();
+            }
+        }
+
+        // Display current question
+        function displayQuestion() {
+            const question = currentQuestions[currentQuestionIndex];
+            
+            document.getElementById('questionNumber').textContent = 
+                `Question ${currentQuestionIndex + 1} of ${currentQuestions.length}`;
+            
+            document.getElementById('questionText').textContent = question.text;
+            
+            // Update progress bar
+            const progress = ((currentQuestionIndex + 1) / currentQuestions.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            
+            // Display options
+            const optionsContainer = document.getElementById('answerOptions');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'answer-option';
+                optionDiv.textContent = option;
+                optionDiv.onclick = () => selectAnswer(index);
+                optionsContainer.appendChild(optionDiv);
+            });
+            
+            // Restore previous selection
+            if (userAnswers[currentQuestionIndex] !== null) {
+                const selectedOptions = userAnswers[currentQuestionIndex];
+                selectedOptions.forEach(index => {
+                    optionsContainer.children[index].classList.add('selected');
+                });
+            }
+
+            // Update navigation buttons
+            document.getElementById('prevBtn').style.display = currentQuestionIndex > 0 ? 'inline-block' : 'none';
+            document.getElementById('nextBtn').style.display = currentQuestionIndex < currentQuestions.length - 1 ? 'inline-block' : 'none';
+            document.getElementById('finishBtn').style.display = currentQuestionIndex === currentQuestions.length - 1 ? 'inline-block' : 'none';
+
+            // Hide explanation initially
+            document.getElementById('explanation').classList.add('hidden');
+
+            // Show timer only in timed mode
+            document.getElementById('timer').style.display = studyMode === 'timed' ? 'block' : 'none';
+        }
+
+        // Handle answer selection
+        function selectAnswer(optionIndex) {
+            const question = currentQuestions[currentQuestionIndex];
+            const optionsContainer = document.getElementById('answerOptions');
+            const isMultipleChoice = question.correctAnswers.length > 1;
+            
+            if (!isMultipleChoice) {
+                // Single choice - clear all selections first
+                Array.from(optionsContainer.children).forEach(child => {
+                    child.classList.remove('selected');
+                });
+                userAnswers[currentQuestionIndex] = [optionIndex];
+            } else {
+                // Multiple choice - toggle selection
+                if (!userAnswers[currentQuestionIndex]) {
+                    userAnswers[currentQuestionIndex] = [];
+                }
+                
+                const currentSelections = userAnswers[currentQuestionIndex];
+                const selectionIndex = currentSelections.indexOf(optionIndex);
+                
+                if (selectionIndex > -1) {
+                    currentSelections.splice(selectionIndex, 1);
+                } else {
+                    currentSelections.push(optionIndex);
+                }
+            }
+            
+            // Update visual selection
+            optionsContainer.children[optionIndex].classList.toggle('selected');
+            
+            // Show immediate feedback in practice mode
+            if (studyMode === 'practice') {
+                showFeedback();
+            }
+        }
+
+        // Show feedback for current question
+        function showFeedback() {
+            const question = currentQuestions[currentQuestionIndex];
+            const userSelection = userAnswers[currentQuestionIndex] || [];
+            const correctAnswers = question.correctAnswers.map(ans => 
+                question.options.findIndex(opt => opt.startsWith(ans + '.'))
+            );
+            
+            const optionsContainer = document.getElementById('answerOptions');
+            
+            // Mark correct and incorrect answers
+            Array.from(optionsContainer.children).forEach((child, index) => {
+                child.classList.remove('correct', 'incorrect');
+                if (correctAnswers.includes(index)) {
+                    child.classList.add('correct');
+                } else if (userSelection.includes(index)) {
+                    child.classList.add('incorrect');
+                }
+            });
+
+            // Show explanation
+            const explanationDiv = document.getElementById('explanation');
+            const isCorrect = arraysEqual(userSelection.sort(), correctAnswers.sort());
+            explanationDiv.innerHTML = `
+                <strong>${isCorrect ? '✅ Correct!' : '❌ Incorrect'}</strong><br>
+                The correct answer${correctAnswers.length > 1 ? 's are' : ' is'}: <strong>${question.correctAnswers.join(', ')}</strong>
+            `;
+            explanationDiv.classList.remove('hidden');
+        }
+
+        // Utility function to compare arrays
+        function arraysEqual(a, b) {
+            return a.length === b.length && a.every((val, index) => val === b[index]);
+        }
+
+        // Navigation functions
+        function previousQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                displayQuestion();
+            }
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIndex < currentQuestions.length - 1) {
+                currentQuestionIndex++;
+                displayQuestion();
+            }
+        }
+
+        // Finish quiz and show results
+        function finishQuiz() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+
+            // Calculate results
+            let correctCount = 0;
+            const incorrectQuestions = [];
+
+            currentQuestions.forEach((question, index) => {
+                const userSelection = userAnswers[index] || [];
+                const correctAnswers = question.correctAnswers.map(ans => 
+                    question.options.findIndex(opt => opt.startsWith(ans + '.'))
+                );
+
+                const isCorrect = arraysEqual(userSelection.sort(), correctAnswers.sort());
+                if (isCorrect) {
+                    correctCount++;
+                } else {
+                    incorrectQuestions.push({
+                        question,
+                        userSelection,
+                        correctAnswers: question.correctAnswers,
+                        questionIndex: index
+                    });
+                }
+            });
+
+            const percentage = Math.round((correctCount / currentQuestions.length) * 100);
+            const totalTime = Math.floor((Date.now() - startTime) / 1000);
+            const minutes = Math.floor(totalTime / 60);
+            const seconds = totalTime % 60;
+
+            // Display results
+            showResults(correctCount, currentQuestions.length, percentage, `${minutes}:${seconds.toString().padStart(2, '0')}`, incorrectQuestions);
+        }
+
+        // Show results section
+        function showResults(correct, total, percentage, timeSpent, incorrectQuestions) {
+            document.getElementById('quizSection').style.display = 'none';
+            document.getElementById('resultsSection').style.display = 'block';
+
+            // Display stats
+            const statsContainer = document.getElementById('statsContainer');
+            statsContainer.innerHTML = `
+                <div class="stat-item">
+                    <div class="stat-value">${correct}/${total}</div>
+                    <div class="stat-label">Questions Correct</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${percentage}%</div>
+                    <div class="stat-label">Score</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${timeSpent}</div>
+                    <div class="stat-label">Time Spent</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${percentage >= 83 ? 'PASS' : 'FAIL'}</div>
+                    <div class="stat-label">Result (83% needed)</div>
+                </div>
+            `;
+
+            // Display incorrect answers
+            const incorrectContainer = document.getElementById('incorrectAnswers');
+            incorrectContainer.innerHTML = '';
+
+            if (incorrectQuestions.length === 0) {
+                incorrectContainer.innerHTML = '<p style="text-align: center; color: #28a745; font-size: 1.2em;">🎉 Perfect score! All answers correct!</p>';
+            } else {
+                incorrectQuestions.forEach(item => {
+                    const reviewDiv = document.createElement('div');
+                    reviewDiv.className = 'review-question';
+                    
+                    const userAnswerLetters = item.userSelection.map(index => 
+                        item.question.options[index] ? item.question.options[index].charAt(0) : 'None'
+                    ).join(', ') || 'No answer selected';
+
+                    reviewDiv.innerHTML = `
+                        <h4>Question ${item.questionIndex + 1}</h4>
+                        <p><strong>Question:</strong> ${item.question.text}</p>
+                        <p><strong>Your Answer:</strong> ${userAnswerLetters}</p>
+                        <p><strong>Correct Answer:</strong> ${item.correctAnswers.join(', ')}</p>
+                        <div style="margin-top: 10px;">
+                            ${item.question.options.map(opt => `<div style="margin: 5px 0;">${opt}</div>`).join('')}
+                        </div>
+                    `;
+                    incorrectContainer.appendChild(reviewDiv);
+                });
+            }
+        }
+
+        // Restart application
+        function restartApp() {
+            document.getElementById('resultsSection').style.display = 'none';
+            document.getElementById('setupSection').style.display = 'block';
+            
+            // Reset form
+            document.getElementById('studyMode').value = 'practice';
+            document.getElementById('numQuestions').value = '10';
+            document.getElementById('rangeStart').value = '';
+            document.getElementById('rangeEnd').value = '';
+            
+            // Clear timer
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+        }
+
+        // Retake same quiz
+        function retakeQuiz() {
+            currentQuestionIndex = 0;
+            userAnswers = new Array(currentQuestions.length).fill(null);
+            startTime = Date.now();
+
+            if (studyMode === 'timed') {
+                startTimer();
+            }
+
+            document.getElementById('resultsSection').style.display = 'none';
+            document.getElementById('quizSection').style.display = 'block';
+
+            displayQuestion();
+        }
+    </script>
+</body>
+</html>
